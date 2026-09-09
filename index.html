@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="BeatVision provider and sponsorship demonstration prototype" />
+  <title>BeatVision | Reveal the World</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">BV</span><div><strong>BEATVISION</strong><small>Every Song Has a World.</small></div></div>
+      <div class="top-actions"><span class="demo-pill">SPONSOR DEMO</span><button id="providerBtn" class="ghost-btn">Provider Partnership</button></div>
+    </header>
+
+    <main>
+      <section id="hero" class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">AI MUSIC VISUALIZATION PLATFORM</p>
+          <h1>Reveal the<br><em>World.</em></h1>
+          <p class="hero-text">BeatVision transforms a song from an audio file into a coherent visual universe, then carries that universe through story, characters, environments, scenes and motion.</p>
+          <div class="hero-actions"><button id="startDemo" class="primary-btn">Start Presentation Demo <span>→</span></button><button id="watchFlow" class="text-btn">See the workflow</button></div>
+        </div>
+        <div class="hero-visual"><div class="orb"></div><div class="orbit o1"></div><div class="orbit o2"></div><div class="visual-label"><span>01</span><b>SONG</b><small>becomes a world</small></div></div>
+      </section>
+
+      <section id="workspace" class="workspace hidden">
+        <aside class="sidebar">
+          <div class="project-mini"><span class="cover">BV</span><div><b id="projectTitle">Midnight Static</b><small>Provider Demo Project</small></div></div>
+          <div class="progress-label"><span>DEMO PROGRESS</span><b id="progressText">0 / 8</b></div>
+          <div id="stageNav" class="stage-nav"></div>
+          <div class="provider-mini"><span class="live-dot"></span><div><b>Demo providers active</b><small>No paid API calls</small></div></div>
+        </aside>
+        <section class="stage-area">
+          <div class="stage-head"><div><p class="eyebrow" id="stageKicker">STAGE 01</p><h2 id="stageTitle">Start with the song</h2></div><span id="stageStatus" class="status">READY</span></div>
+          <div id="stageContent" class="stage-content"></div>
+          <div class="stage-footer"><button id="backBtn" class="ghost-btn">← Back</button><button id="nextBtn" class="primary-btn">Continue →</button></div>
+        </section>
+      </section>
+
+      <section id="providerPanel" class="provider-panel hidden">
+        <div class="provider-head"><div><p class="eyebrow">PARTNERSHIP VIEW</p><h2>Where your technology fits.</h2><p>BeatVision is intentionally provider-neutral. A partner can power one capability or the entire creative pipeline.</p></div><button id="closeProvider" class="ghost-btn">Close</button></div>
+        <div class="provider-grid">
+          <article><span class="provider-num">01</span><h3>Language & Reasoning</h3><p>Turn lyrics, notes and musical intent into a structured visual world, narrative beats and production-ready scene direction.</p><b>Needed: model API + inference credits</b></article>
+          <article><span class="provider-num">02</span><h3>Image Generation</h3><p>Create character sheets, environments, style frames and consistent scene imagery from BeatVision's structured prompts.</p><b>Needed: image API + generation credits</b></article>
+          <article><span class="provider-num">03</span><h3>Video Generation</h3><p>Animate approved scenes, preserve visual identity, synchronize motion to musical sections and assemble the final experience.</p><b>Needed: video API + render capacity</b></article>
+          <article><span class="provider-num">04</span><h3>Infrastructure</h3><p>Store projects and assets, queue long-running generation jobs, render outputs and deliver finished media reliably.</p><b>Needed: compute + storage + bandwidth</b></article>
+        </div>
+        <div class="partner-cta"><div><p class="eyebrow">THE ASK</p><h3>Help us turn a working creative concept into a scalable creator platform.</h3></div><div class="ask-list"><span>API credits</span><span>Startup / creator program</span><span>Infrastructure sponsorship</span><span>Strategic partnership</span></div></div>
+      </section>
+    </main>
+    <footer><span>BEATVISION TEST • PROVIDER PRESENTATION EDITION</span><span>Demo outputs are simulated unless a live provider is connected.</span></footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
