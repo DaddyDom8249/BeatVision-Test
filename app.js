@@ -8,13 +8,48 @@ const stages = [
   { name: 'Motion & Edit', kicker: 'STAGE 07', status: 'PREVIEW' },
   { name: 'The Pitch', kicker: 'STAGE 08', status: 'PARTNERSHIP' }
 ];
-const demo = { project:'Midnight Static', current:0, approved:JSON.parse(localStorage.getItem('beatvision-demo-approvals')||'{}') };
+const STORAGE_KEY = 'beatvision-demo-approvals';
+const demo = { project:'Midnight Static', current:0, approved:loadState() };
 const $=s=>document.querySelector(s);
-const saveState=()=>localStorage.setItem('beatvision-demo-approvals',JSON.stringify(demo.approved));
-function renderNav(){ $('#stageNav').innerHTML=stages.map((s,i)=>`<button class="stage-item ${i===demo.current?'active':''} ${demo.approved[i]||i<demo.current?'done':''}" data-stage="${i}" type="button"><span>${String(i+1).padStart(2,'0')}</span><span>${s.name}</span></button>`).join(''); document.querySelectorAll('[data-stage]').forEach(b=>b.onclick=()=>setStage(+b.dataset.stage)); $('#progressText').textContent=`${demo.current+1} / ${stages.length}`; }
-function setStage(i){demo.current=Math.max(0,Math.min(7,i));renderNav();render();window.scrollTo({top:0,behavior:'smooth'});}
+function loadState(){
+  try{
+    const value=localStorage.getItem(STORAGE_KEY);
+    return value ? JSON.parse(value) : {};
+  }catch(_){
+    return {};
+  }
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(demo.approved)); }catch(_){}
+}
+function resetDemo(){
+  demo.current=0;
+  demo.approved={};
+  saveState();
+  closeProviderPanel();
+  renderNav();
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderNav(){
+  const nav=$('#stageNav');
+  if(nav) nav.innerHTML=stages.map((s,i)=>`<button class="stage-item ${i===demo.current?'active':''} ${demo.approved[i]||i<demo.current?'done':''}" data-stage="${i}" type="button"><span>${String(i+1).padStart(2,'0')}</span><span>${s.name}</span></button>`).join('');
+  document.querySelectorAll('[data-stage]').forEach(b=>b.onclick=()=>setStage(+b.dataset.stage));
+  const progress=$('#progressText');
+  if(progress) progress.textContent=`${demo.current+1} / ${stages.length}`;
+}
+function setStage(i){demo.current=Math.max(0,Math.min(stages.length-1,i));renderNav();render();window.scrollTo({top:0,behavior:'smooth'});}
 function approvalButton(i,label){return `<button class="primary-btn approval-btn" data-approve="${i}" type="button">${demo.approved[i]?'✓ '+label+' Approved':label}</button>`;}
-function render(){const s=stages[demo.current], views=[song,world,assets,storyboard,prompts,scenes,motion,pitch];$('#stageKicker').textContent=s.kicker;$('#stageTitle').textContent=s.name;$('#stageStatus').textContent=demo.approved[demo.current]?'APPROVED':s.status;$('#backBtn').style.visibility=demo.current?'visible':'hidden';$('#nextBtn').textContent=demo.current===7?'Restart demo →':'Continue →';$('#stageContent').innerHTML=views[demo.current]();bindStageActions();}
+function render(){
+  const s=stages[demo.current], views=[song,world,assets,storyboard,prompts,scenes,motion,pitch];
+  $('#stageKicker').textContent=s.kicker;
+  $('#stageTitle').textContent=s.name;
+  $('#stageStatus').textContent=demo.approved[demo.current]?'APPROVED':s.status;
+  $('#backBtn').style.visibility=demo.current?'visible':'hidden';
+  $('#nextBtn').textContent=demo.current===stages.length-1?'Restart demo →':'Continue →';
+  $('#stageContent').innerHTML=views[demo.current]();
+  bindStageActions();
+}
 function song(){return `<div class="song-card card"><div class="art">BV</div><div class="meta"><span class="meta-label">DEMO TRACK</span><h3>Midnight Static</h3><p>Original demonstration track • 03:42</p><div class="input-row"><span class="meta-label">CREATIVE DIRECTION</span><div class="fake-input">Neon-noir • emotional • cinematic • industrial pulse</div></div><div class="input-row"><span class="meta-label">LYRICS</span><div class="fake-input">A city breathing electricity...<br>Every shadow knows my name...<br>We disappear into the static.</div></div></div></div><div class="card" style="margin-top:14px"><span class="meta-label">THE IDEA</span><p>BeatVision does not ask the creator to become a prompt engineer. The creator supplies the song and intent. The system builds the visual language.</p><div class="tag-row"><span class="tag">DEMO MODE</span><span class="tag">NO PAID API CALLS</span><span class="tag">PROVIDER NEUTRAL</span></div></div>`;}
 function world(){return `<div class="card"><div style="display:flex;justify-content:space-between;gap:20px"><div><span class="meta-label">VISUAL WORLD REPORT</span><h3>NEON AFTERIMAGE</h3></div><span class="tag">DEMO OUTPUT</span></div><p>A rain-slick midnight city where memory behaves like electricity. Human emotion appears as colored interference across glass, skin and architecture. The camera feels intimate even when the world is enormous.</p><div class="tag-row"><span class="tag">NEON NOIR</span><span class="tag">RAIN</span><span class="tag">CHROMATIC GHOSTS</span><span class="tag">35MM GRAIN</span><span class="tag">HIGH CONTRAST</span></div></div><div class="report-grid" style="margin-top:14px"><div class="card"><span class="meta-label">EMOTIONAL ARC</span><p>Isolation → pursuit → confrontation → release</p></div><div class="card"><span class="meta-label">VISUAL RULE</span><p>Keep the protagonist warm against a cold, electrically alive city.</p></div></div><div class="card" style="margin-top:14px;border-color:#4a3a25"><span class="meta-label">APPROVAL GATE</span><p>In the full product, this is where the creator confirms: <b>“Yes, that’s my world.”</b></p>${approvalButton(1,'Approve World')}</div>`;}
 function assets(){return `<div class="assets-grid"><div class="card asset"><div class="asset-img"></div><span class="meta-label">01 • WORLD STYLE BIBLE</span><h3>Neon Afterimage</h3><p>Palette, texture, lens language, lighting and continuity rules.</p></div><div class="card asset"><div class="asset-img"></div><span class="meta-label">02 • CHARACTER</span><h3>The Runner</h3><p>Consistent silhouette, wardrobe, age, expression and visual identity.</p></div><div class="card asset"><div class="asset-img"></div><span class="meta-label">03 • ENVIRONMENT</span><h3>Electric City</h3><p>Rain, glass towers, underpasses and luminous signage.</p></div></div><div class="card" style="margin-top:14px"><span class="meta-label">CONSISTENCY ENGINE</span><p>Shared creative constraints travel with every downstream scene, giving providers a structured target instead of isolated prompts.</p>${approvalButton(2,'Approve Assets')}</div>`;}
@@ -23,9 +58,22 @@ function prompts(){return `<div class="card"><span class="meta-label">SCENE PROM
 function scenes(){return `<div class="scene-grid">${['SIGNAL','CITY','RUN','MEMORY','CROSSING','FIGHT','BREAKTHROUGH','AFTERIMAGE'].map((n,i)=>`<div class="card scene"><div class="scene-thumb">SCENE ${String(i+1).padStart(2,'0')}</div><div class="scene-info"><b>${n}</b><p>Provider-ready visual frame</p></div></div>`).join('')}</div><div class="card" style="margin-top:14px"><span class="meta-label">REFERENCE PHOTO SUPPORT</span><p>Creator reference images can be assigned to individual scenes. Reference IDs stay separate from prompts so a connected provider can receive image inputs where supported.</p></div>`;}
 function motion(){return `<div class="motion"><div><div class="timeline"><span class="meta-label">MOTION TIMELINE • 03:42</span><div class="track"></div><div class="track"></div><div class="track"></div><div class="playhead"></div></div><div class="card" style="margin-top:14px"><span class="meta-label">VIDEO PROVIDER HANDOFF</span><p>Approved scene images become source frames. A video provider supplies motion, camera movement and temporal consistency. BeatVision owns the creative sequence and final edit logic.</p></div></div><div class="card"><span class="meta-label">EXPORT PLAN</span><h3>Music Video</h3><p>8 scenes • beat-synced transitions • final audio • 16:9 master</p><div class="tag-row"><span class="tag">1080P</span><span class="tag">24 FPS</span><span class="tag">H.264</span></div><button class="primary-btn" style="margin-top:20px" data-preview-render type="button">Preview Render</button><p class="demo-note" data-render-status>Presentation prototype: rendering is simulated.</p></div></div>`;}
 function pitch(){return `<div class="card pitch-card"><span class="meta-label">BEATVISION × YOUR TECHNOLOGY</span><h3 class="pitch-title">The creative pipeline is ready. Your technology can power the engine.</h3><p class="pitch-lead">BeatVision orchestrates specialized AI capabilities behind one creator experience. We are seeking providers willing to support the prototype with API credits, startup programs, infrastructure or strategic partnership.</p><div class="provider-grid"><article><span class="provider-num">01 • LANGUAGE</span><h3>World + Story</h3><p>Lyrics interpretation, emotional arcs, world reports, continuity and scene direction.</p><b>Integration: structured text generation</b></article><article><span class="provider-num">02 • IMAGE</span><h3>Visual Assets</h3><p>Style frames, characters, environments and reference-aware scene imagery.</p><b>Integration: image generation + inputs</b></article><article><span class="provider-num">03 • VIDEO</span><h3>Motion</h3><p>Image-to-video, camera movement, temporal consistency and rendering.</p><b>Integration: video generation API</b></article><article><span class="provider-num">04 • AUDIO</span><h3>Music Intelligence</h3><p>Beat, section, energy and musical-event analysis to drive timing and visual pacing.</p><b>Integration: audio analysis API or SDK</b></article><article><span class="provider-num">05 • INFRA</span><h3>Scale</h3><p>Jobs, storage, compute, queues, bandwidth and media delivery.</p><b>Integration: infrastructure services</b></article></div><div class="ask-box"><div><span class="meta-label">WHAT WE NEED</span><p>API credits • startup/creator program • compute • storage • technical partnership</p></div><div><span class="meta-label">WHAT PARTNERS GET</span><p>Visible product integration • provider-specific demos • technical acknowledgement • case-study opportunity</p></div></div><div class="card" style="margin-top:14px"><span class="meta-label">INTEGRATION PRINCIPLE</span><p>BeatVision owns the orchestration layer and creative state. Providers remain interchangeable capability partners. That makes sponsorship useful without making the product dependent on one vendor.</p></div></div>`;}
-function bindStageActions(){document.querySelectorAll('[data-approve]').forEach(b=>b.onclick=()=>{demo.approved[+b.dataset.approve]=true;saveState();renderNav();render();});const p=$('[data-preview-render]');if(p)p.onclick=()=>{const s=$('[data-render-status]');p.disabled=true;p.textContent='Preparing preview…';s.textContent='Demo render pipeline staged. No external provider call was made.';setTimeout(()=>{p.disabled=false;p.textContent='Preview Render';},900);};}
-$('#startDemo').onclick=()=>{$('#hero').classList.add('hidden');$('#workspace').classList.remove('hidden');setStage(0);};
-$('#watchFlow').onclick=()=>{$('#hero').classList.add('hidden');$('#workspace').classList.remove('hidden');setStage(0);};
-$('#nextBtn').onclick=()=>{if(demo.current===7){demo.current=0;demo.approved={};saveState();renderNav();render();return;}setStage(demo.current+1);};
-$('#backBtn').onclick=()=>setStage(demo.current-1);$('#providerBtn').onclick=()=>$('#providerPanel').classList.remove('hidden');$('#closeProvider').onclick=()=>$('#providerPanel').classList.add('hidden');
-document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'&&!e.ctrlKey&&!e.metaKey)setStage(demo.current+1);if(e.key==='ArrowLeft'&&!e.ctrlKey&&!e.metaKey&&demo.current>0)setStage(demo.current-1);if(e.key==='Escape')$('#providerPanel').classList.add('hidden');});renderNav();
+function bindStageActions(){
+  document.querySelectorAll('[data-approve]').forEach(b=>b.onclick=()=>{demo.approved[+b.dataset.approve]=true;saveState();renderNav();render();});
+  const p=$('[data-preview-render');
+  if(p)p.onclick=()=>{const s=$('[data-render-status]');p.disabled=true;p.textContent='Preparing preview…';s.textContent='Demo render pipeline staged. No external provider call was made.';setTimeout(()=>{p.disabled=false;p.textContent='Preview Render';},900);};
+}
+function closeProviderPanel(){$('#providerPanel').classList.add('hidden');}
+function openWorkspace(){
+  $('#hero').classList.add('hidden');
+  $('#workspace').classList.remove('hidden');
+  setStage(demo.current);
+}
+$('#startDemo').onclick=openWorkspace;
+$('#watchFlow').onclick=openWorkspace;
+$('#nextBtn').onclick=()=>{if(demo.current===stages.length-1){resetDemo();return;}setStage(demo.current+1);};
+$('#backBtn').onclick=()=>setStage(demo.current-1);
+$('#providerBtn').onclick=()=>$('#providerPanel').classList.remove('hidden');
+$('#closeProvider').onclick=closeProviderPanel;
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'&&!e.ctrlKey&&!e.metaKey)setStage(demo.current+1);if(e.key==='ArrowLeft'&&!e.ctrlKey&&!e.metaKey&&demo.current>0)setStage(demo.current-1);if(e.key==='Escape')closeProviderPanel();});
+renderNav();
